@@ -29,7 +29,7 @@ def create_app(test_config=None):
     @app.route('/sign_up', methods=('GET', 'POST'))
     def sign_up():
         if request.method == 'POST': #check method on req
-          username = request.from['username']
+          username = request.form['username']
           password = request.form['passowrd']
           error = None
           
@@ -53,8 +53,37 @@ def create_app(test_config=None):
 
         return render_template('sign_up.html') #tells the route what needs to be displayed
     
-    @app.route('log_in')
+    @app.route('/log_in', methods=('GET', 'POST'))
     def log_in():
-      return "Log in"
+      if request.method == 'POST': #check method on req
+          username = request.form['username']
+          password = request.form['passowrd']
+          error = None
+
+          user = User.query.filter_by(username=username).first()
+
+          #if no user or if passoword for user doesnt exist
+          if not user or not check_password_hash(user.password, password):
+            error = 'Username or password are incorrect.'
+
+          if error is None:
+            session.clear() #reset the session by clearing it before login
+            session['user_id'] = user.id #assignes the user an id 
+            return redirect(url_for('index')) #redirects to homepage after login
+
+          flash(error, 'error')
+
+      return render_template('log_in.html') #tells the route what needs to be displayed
+    
+    @app.route('/log_out', methods=('GET', 'DELETE'))
+    def log_out():
+      session.clear()
+      flash('Log out successful.', 'success')
+      return redirect(url_for('log_in')) #clears session and logs user out 
+
+    @app.route('/')
+    def index():
+      return 'Index'
+
 
     return app
