@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from mistune import markdown
 
 #instance of the database
 db = SQLAlchemy() #connects to the db
@@ -24,3 +25,6 @@ class Note(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     #references user class with the foreignKey
 
+    @property #create a method that doesnt have to be called
+    def body_html(self):
+        return markdown(self.body)
