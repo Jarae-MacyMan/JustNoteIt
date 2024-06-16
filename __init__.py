@@ -8,6 +8,9 @@ from werkzeug.security import generate_password_hash
 #encrypts the password
 
 
+
+
+
 def create_app(test_config=None):
     app = Flask(__name__) #creates flask instance
     app.config.from_mapping(
